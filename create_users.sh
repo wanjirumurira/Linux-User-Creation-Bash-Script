@@ -13,7 +13,7 @@ log_dir="/var/log"
 log_file="$log_dir/user_management.log"
 
 secure_dir="/var/secure"
-password_file="$secure_dir/user_passwords.txt"
+password_file="$secure_dir/user_passwords.csv"
 
 # Function to create directories if they don't exist and assigning the necessary permission
 create_directories() {
@@ -36,6 +36,7 @@ create_directories() {
 generate_password() {
     local password_length=12
     local password="$(openssl rand -base64 12 | tr -d '/+' | head -c $password_length)"
+    echo "$password"
 }
 
 # Function to log messages with timestamp

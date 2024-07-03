@@ -32,20 +32,27 @@ create_directories() {
     fi
 }
 
-# Function to generate a random password
-generate_password() {
-    local password_length=12
-    local password="$(openssl rand -base64 12 | tr -d '/+' | head -c $password_length)"
-    echo "$password"
-}
-
 # Function to log messages with timestamp
 log() {
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
     echo "$timestamp $1" >> "$log_file"
 }
 
-# Function to process user creation from a file
+# Function to generate a random password
+
+
+generate_password() {
+    # Set the desired length of the password
+    local password_length=12 
+    # Generate the password
+    local password="$(openssl rand -base64 12 | tr -d '/+' | head -c $password_length)"  
+    # Output the generated password
+    echo "$password"  
+}
+
+
+
+# Function to check if file is valid
 process_user_file() {
     local filename="$1"
     # Check if the file exists and is readable
@@ -80,15 +87,20 @@ create_user() {
         local password=$(generate_password)
         # Create user with home directory
         sudo useradd -m -p "$(openssl passwd -6 "$password")" "$username"
-        
+        # Making the user the owner of the directory
+        sudo chown "$username":/home/"$username"
+
         # Set initial group (same as username)
-	# Automatically, once a user is created a group with the same name as the user is created 
-	# Check if group already exists
+	    # Automatically, once a user is created a group with the same name as the user is created 
+	    # Check if group already exists
         if ! grep -q "^$username:" /etc/group; then
            sudo groupadd "$username"
+            #Adding the user to the group which is the primary group
+            sudo usermod -aG group_name "$username"
+            #change the primary group of a user
+            sudo usermod -g "$username" "$username"
         fi
-
-       #sudo usermod -g "$username" "$username"
+       
         
         echo "****User '$username' created successfully.****"
         

@@ -104,7 +104,7 @@ create_user() {
         echo "****User '$username' created successfully.****"
         # Log and store password securely
         echo "Username: $username, Password: $password" >> "$password_file"
-	l   log "Password for '$username' securely stored in $password_file."
+	    log "Password for '$username' securely stored in $password_file."
         echo "****Password for '$username' securely stored in $password_file.****"
         # Add user to additional groups
         add_to_groups "$username" "$groups"

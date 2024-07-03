@@ -88,7 +88,8 @@ create_user() {
         # Create user with home directory
         sudo useradd -m -p "$(openssl passwd -6 "$password")" "$username"
         # Making the user the owner of the directory
-        sudo chown "$username":/home/"$username"
+        sudo chown "$username:$username" "/home/$username"
+
 
         # Set initial group (same as username)
 	    # Automatically, once a user is created a group with the same name as the user is created 
@@ -100,16 +101,11 @@ create_user() {
             #change the primary group of a user
             sudo usermod -g "$username" "$username"
         fi
-       
-        
         echo "****User '$username' created successfully.****"
-        
         # Log and store password securely
         echo "Username: $username, Password: $password" >> "$password_file"
-
-	log "Password for '$username' securely stored in $password_file."
+	l   log "Password for '$username' securely stored in $password_file."
         echo "****Password for '$username' securely stored in $password_file.****"
-        
         # Add user to additional groups
         add_to_groups "$username" "$groups"
     fi
@@ -120,8 +116,10 @@ add_to_groups() {
     local username="$1"
     local groups="$2"
     IFS=',' read -ra group_list <<< "$groups"
+    # Split groups into an array using comma as delimiter
     for group in "${group_list[@]}"; do
         if grep -q "^$group:" /etc/group; then
+            # If group exists add user to the group
             sudo usermod -aG "$group" "$username"
             log "User '$username' added to group '$group' successfully."
             echo "****User '$username' added to group '$group' successfully.****"
